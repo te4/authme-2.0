@@ -36,6 +36,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
 
@@ -177,7 +178,7 @@ public class AuthMePlayerListener extends PlayerListener {
             event.setTo(event.getFrom());
         }
     }
-
+    
     @Override
     public void onPlayerLogin(PlayerLoginEvent event) {
         if (event.getResult() != Result.ALLOWED || event.getPlayer() == null) {
@@ -208,17 +209,21 @@ public class AuthMePlayerListener extends PlayerListener {
 
         //Check if forceSingleSession is set to true, so kick player that has joined with same nick of online player
         if(player.isOnline() && settings.isForceSingleSessionEnabled()) {
-               event.disallow(Result.KICK_OTHER, m._("same_nick"));
+               //System.out.println("[Debug name] "+player.getName());
+               player.kickPlayer(m._("same_nick"));
+               event.disallow(PlayerLoginEvent.Result.KICK_OTHER, m._("same_nick"));  
                return;
-        }
-        /* OLD METHOD 
+        } 
+       /* // OLD METHOD 
         for (Player onlinePlayer : plugin.getServer().getOnlinePlayers()) {
-            if (onlinePlayer.getName().equals(player.getName())) {
+            System.out.println("[Debug name 3] "+onlinePlayer.getName());
+            if (onlinePlayer.getName().equalsIgnoreCase(player.getName())) {
+                System.out.println("[Debug name 2] "+onlinePlayer.getName());
                 event.disallow(Result.KICK_OTHER, m._("same_nick"));
                 return;
             }
-        }
-        */
+        } */
+       
         if (settings.isKickNonRegisteredEnabled()) {
             if (!data.isAuthAvailable(name)) {
                 event.disallow(Result.KICK_OTHER, m._("reg_only"));
@@ -317,7 +322,15 @@ public class AuthMePlayerListener extends PlayerListener {
         if (CitizensCommunicator.isNPC(player)) {
             return;
         }
-
+        
+        // Check for Minecraft message kick request on same nickname
+	// Work only for off-line server
+		if (settings.isForcedRegistrationEnabled()) {
+			if (event.getReason().equals("You logged in from another location")) {
+                            //System.out.println("[Debug same nick] "+event.getReason());	
+                            event.setCancelled(true); }
+                }
+             
         String name = player.getName().toLowerCase();
         if (LimboCache.getInstance().hasLimboPlayer(name)) {
             LimboPlayer limbo = LimboCache.getInstance().getLimboPlayer(name);
@@ -454,4 +467,5 @@ public class AuthMePlayerListener extends PlayerListener {
         }
         event.setCancelled(true);
     }
+    
 }
