@@ -190,7 +190,7 @@ public final class Settings extends Configuration {
     }
     
     public boolean isForceSingleSessionEnabled() {
-        String key = "settings.restrictions.ForceSignleSession";
+        String key = "settings.restrictions.ForceSingleSession";
         if (getString(key) == null) {
             setProperty(key, false);
         }
