@@ -50,6 +50,7 @@ import uk.org.whoami.authme.settings.Settings;
 import uk.org.whoami.authme.task.MessageTask;
 import uk.org.whoami.authme.task.TimeoutTask;
 
+
 public class AuthMePlayerListener extends PlayerListener {
 
     private Settings settings = Settings.getInstance();
@@ -70,7 +71,7 @@ public class AuthMePlayerListener extends PlayerListener {
 
         Player player = event.getPlayer();
         String name = player.getName().toLowerCase();
-
+        
         if (CitizensCommunicator.isNPC(player)) {
             return;
         }
@@ -189,6 +190,8 @@ public class AuthMePlayerListener extends PlayerListener {
         if (CitizensCommunicator.isNPC(player)) {
             return;
         }
+        
+       
 
         int min = settings.getMinNickLength();
         int max = settings.getMaxNickLength();
@@ -203,14 +206,19 @@ public class AuthMePlayerListener extends PlayerListener {
             return;
         }
 
-        //Remove doubles from premises
+        //Check if forceSingleSession is set to true, so kick player that has joined with same nick of online player
+        if(player.isOnline() && settings.isForceSingleSessionEnabled()) {
+               event.disallow(Result.KICK_OTHER, m._("same_nick"));
+               return;
+        }
+        /* OLD METHOD 
         for (Player onlinePlayer : plugin.getServer().getOnlinePlayers()) {
             if (onlinePlayer.getName().equals(player.getName())) {
                 event.disallow(Result.KICK_OTHER, m._("same_nick"));
                 return;
             }
         }
-
+        */
         if (settings.isKickNonRegisteredEnabled()) {
             if (!data.isAuthAvailable(name)) {
                 event.disallow(Result.KICK_OTHER, m._("reg_only"));
@@ -232,7 +240,7 @@ public class AuthMePlayerListener extends PlayerListener {
         if (CitizensCommunicator.isNPC(player)) {
             return;
         }
-
+        
         if (PlayerCache.getInstance().isAuthenticated(name)) {
             return;
         }

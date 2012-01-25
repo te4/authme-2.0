@@ -60,6 +60,7 @@ public final class Settings extends Configuration {
         isMovementAllowed();
         getMovementRadius();
         isKickNonRegisteredEnabled();
+        isForceSingleSessionEnabled();
         getPasswordHash();
         getDataSource();
         isCachingEnabled();
@@ -182,6 +183,14 @@ public final class Settings extends Configuration {
 
     public boolean isKickNonRegisteredEnabled() {
         String key = "settings.restrictions.kickNonRegistered";
+        if (getString(key) == null) {
+            setProperty(key, false);
+        }
+        return getBoolean(key, false);
+    }
+    
+    public boolean isForceSingleSessionEnabled() {
+        String key = "settings.restrictions.ForceSignleSession";
         if (getString(key) == null) {
             setProperty(key, false);
         }

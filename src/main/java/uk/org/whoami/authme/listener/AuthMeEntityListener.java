@@ -43,10 +43,17 @@ public class AuthMeEntityListener extends EntityListener {
             return;
         }
         Entity entity = event.getEntity();
+ 
         if (!(entity instanceof Player)) {
             return;
         }
-
+        System.out.println("[ npc danno ] "+event.getEntity().toString());
+        /*
+        if(event.getEntity().toString().indexOf("PvPLogger") != -1 ) {
+            System.out.println("la stringa contiene PvPLogger 2");
+            return;
+        }
+*/
         if(CitizensCommunicator.isNPC(entity)) {
             return;
         }
