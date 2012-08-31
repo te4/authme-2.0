@@ -17,8 +17,10 @@
 package uk.org.whoami.authme.listener;
 
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.BlockPlaceEvent;
 
 import uk.org.whoami.authme.cache.auth.PlayerCache;
@@ -26,7 +28,7 @@ import uk.org.whoami.authme.citizens.CitizensCommunicator;
 import uk.org.whoami.authme.datasource.DataSource;
 import uk.org.whoami.authme.settings.Settings;
 
-public class AuthMeBlockListener extends BlockListener {
+public class AuthMeBlockListener implements Listener {
 
     private DataSource data;
     private Settings settings = Settings.getInstance();
@@ -35,7 +37,7 @@ public class AuthMeBlockListener extends BlockListener {
         this.data = data;
     }
 
-    @Override
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onBlockPlace(BlockPlaceEvent event) {
         if (event.isCancelled() || event.getPlayer() == null) {
             return;
@@ -61,7 +63,7 @@ public class AuthMeBlockListener extends BlockListener {
         event.setCancelled(true);
     }
 
-    @Override
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onBlockBreak(BlockBreakEvent event) {
         if (event.isCancelled() || event.getPlayer() == null) {
             return;

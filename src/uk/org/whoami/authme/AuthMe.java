@@ -20,8 +20,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
-import org.bukkit.event.Event.Priority;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -98,40 +96,9 @@ public class AuthMe extends JavaPlugin {
         AuthMeEntityListener entityListener = new AuthMeEntityListener(database);
 
         PluginManager pm = getServer().getPluginManager();
-        pm.registerEvent(Event.Type.PLAYER_COMMAND_PREPROCESS, playerListener,
-                         Priority.Lowest, this);
-        pm.registerEvent(Event.Type.PLAYER_CHAT, playerListener,
-                         Priority.Lowest, this);
-        pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener,
-                         Priority.Lowest, this);
-        pm.registerEvent(Event.Type.PLAYER_LOGIN, playerListener,
-                         Priority.Lowest, this);
-        pm.registerEvent(Event.Type.PLAYER_JOIN, playerListener,
-                         Priority.Lowest, this);
-        pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener,
-                         Priority.Lowest, this);
-        pm.registerEvent(Event.Type.PLAYER_KICK, playerListener,
-                         Priority.Monitor, this);
-        pm.registerEvent(Event.Type.PLAYER_PICKUP_ITEM, playerListener,
-                         Priority.Lowest, this);
-        pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener,
-                         Priority.Lowest, this);
-        pm.registerEvent(Event.Type.PLAYER_INTERACT_ENTITY, playerListener,
-                         Priority.Low, this);
-        pm.registerEvent(Event.Type.PLAYER_DROP_ITEM, playerListener,
-                         Priority.Low, this);
-        pm.registerEvent(Event.Type.PLAYER_BED_ENTER, playerListener,
-                         Priority.Low, this);
-        pm.registerEvent(Event.Type.BLOCK_PLACE, blockListener,
-                         Priority.Lowest, this);
-        pm.registerEvent(Event.Type.BLOCK_BREAK, blockListener,
-                         Priority.Lowest, this);
-        pm.registerEvent(Event.Type.FOOD_LEVEL_CHANGE, entityListener,
-                         Priority.Low, this);
-        pm.registerEvent(Event.Type.ENTITY_DAMAGE, entityListener,
-                         Priority.Lowest, this);
-        pm.registerEvent(Event.Type.ENTITY_TARGET, entityListener,
-                         Priority.Lowest, this);
+        pm.registerEvents(playerListener, this);
+        pm.registerEvents(blockListener, this);
+        pm.registerEvents(entityListener, this);
 
         this.getCommand("authme").setExecutor(new AdminCommand(database));
         this.getCommand("register").setExecutor(new RegisterCommand(database));

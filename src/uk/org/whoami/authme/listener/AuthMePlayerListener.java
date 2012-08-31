@@ -21,6 +21,9 @@ import java.util.Date;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
@@ -29,14 +32,12 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
-import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
 
@@ -52,7 +53,7 @@ import uk.org.whoami.authme.task.MessageTask;
 import uk.org.whoami.authme.task.TimeoutTask;
 
 
-public class AuthMePlayerListener extends PlayerListener {
+public class AuthMePlayerListener implements Listener {
 
     private Settings settings = Settings.getInstance();
     private Messages m = Messages.getInstance();
@@ -64,7 +65,7 @@ public class AuthMePlayerListener extends PlayerListener {
         this.data = data;
     }
 
-    @Override
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
         if (event.isCancelled() || event.getPlayer() == null) {
             return;
@@ -102,7 +103,7 @@ public class AuthMePlayerListener extends PlayerListener {
         event.setCancelled(true);
     }
 
-    @Override
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerChat(PlayerChatEvent event) {
         if (event.isCancelled() || event.getPlayer() == null) {
             return;
@@ -133,7 +134,7 @@ public class AuthMePlayerListener extends PlayerListener {
         event.setCancelled(true);
     }
 
-    @Override
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerMove(PlayerMoveEvent event) {
         if (event.isCancelled() || event.getPlayer() == null) {
             return;
@@ -179,7 +180,7 @@ public class AuthMePlayerListener extends PlayerListener {
         }
     }
     
-    @Override
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerLogin(PlayerLoginEvent event) {
         if (event.getResult() != Result.ALLOWED || event.getPlayer() == null) {
             return;
@@ -232,7 +233,7 @@ public class AuthMePlayerListener extends PlayerListener {
         }
     }
 
-    @Override
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerJoin(PlayerJoinEvent event) {
         if (event.getPlayer() == null) {
             return;
@@ -288,7 +289,7 @@ public class AuthMePlayerListener extends PlayerListener {
         sched.scheduleSyncDelayedTask(plugin, new MessageTask(plugin, name, msg, msgInterval));
     }
 
-    @Override
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerQuit(PlayerQuitEvent event) {
         if (event.getPlayer() == null) {
             return;
@@ -311,7 +312,7 @@ public class AuthMePlayerListener extends PlayerListener {
         PlayerCache.getInstance().removePlayer(name);
     }
 
-    @Override
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerKick(PlayerKickEvent event) {
         if (event.getPlayer() == null) {
             return;
@@ -343,7 +344,7 @@ public class AuthMePlayerListener extends PlayerListener {
         PlayerCache.getInstance().removePlayer(name);
     }
 
-    @Override
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerPickupItem(PlayerPickupItemEvent event) {
         if (event.isCancelled() || event.getPlayer() == null) {
             return;
@@ -369,7 +370,7 @@ public class AuthMePlayerListener extends PlayerListener {
         event.setCancelled(true);
     }
 
-    @Override
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerInteract(PlayerInteractEvent event) {
         if (event.isCancelled() || event.getPlayer() == null) {
             return;
@@ -395,7 +396,7 @@ public class AuthMePlayerListener extends PlayerListener {
         event.setCancelled(true);
     }
 
-    @Override
+    @EventHandler(priority = EventPriority.LOW)
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
         if (event.isCancelled() || event.getPlayer() == null) {
             return;
@@ -420,7 +421,7 @@ public class AuthMePlayerListener extends PlayerListener {
         event.setCancelled(true);
     }
 
-    @Override
+    @EventHandler(priority = EventPriority.LOW)
     public void onPlayerDropItem(PlayerDropItemEvent event) {
         if (event.isCancelled() || event.getPlayer() == null) {
             return;
@@ -444,7 +445,7 @@ public class AuthMePlayerListener extends PlayerListener {
         event.setCancelled(true);
     }
 
-    @Override
+    @EventHandler(priority = EventPriority.LOW)
     public void onPlayerBedEnter(PlayerBedEnterEvent event) {
         if (event.isCancelled() || event.getPlayer() == null) {
             return;
