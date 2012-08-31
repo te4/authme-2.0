@@ -206,22 +206,12 @@ public class AuthMePlayerListener implements Listener {
             return;
         }
 
-        //Check if forceSingleSession is set to true, so kick player that has joined with same nick of online player
+        // Remove doubles from premises
         if(player.isOnline() && plugin.getConfig().getBoolean("settings.restrictions.ForceSingleSession")) {
-               //System.out.println("[Debug name] "+player.getName());
                player.kickPlayer(m._("same_nick"));
                event.disallow(PlayerLoginEvent.Result.KICK_OTHER, m._("same_nick"));  
                return;
         } 
-       /* // OLD METHOD 
-        for (Player onlinePlayer : plugin.getServer().getOnlinePlayers()) {
-            System.out.println("[Debug name 3] "+onlinePlayer.getName());
-            if (onlinePlayer.getName().equalsIgnoreCase(player.getName())) {
-                System.out.println("[Debug name 2] "+onlinePlayer.getName());
-                event.disallow(Result.KICK_OTHER, m._("same_nick"));
-                return;
-            }
-        } */
        
         if (plugin.getConfig().getBoolean("settings.restrictions.kickNonRegistered")) {
             if (!data.isAuthAvailable(name)) {
@@ -304,6 +294,7 @@ public class AuthMePlayerListener implements Listener {
             LimboPlayer limbo = LimboCache.getInstance().getLimboPlayer(name);
             player.getInventory().setArmorContents(limbo.getArmour());
             player.getInventory().setContents(limbo.getInventory());
+            player.teleport(limbo.getLoc());
             plugin.getServer().getScheduler().cancelTask(limbo.getTimeoutTaskId());
             LimboCache.getInstance().deleteLimboPlayer(name);
         }
@@ -322,14 +313,6 @@ public class AuthMePlayerListener implements Listener {
             return;
         }
         
-        // Check for Minecraft message kick request on same nickname
-	// Work only for off-line server
-		if (plugin.getConfig().getBoolean("settings.registration.force")) {
-			if (event.getReason().equals("You logged in from another location")) {
-                            //System.out.println("[Debug same nick] "+event.getReason());	
-                            event.setCancelled(true); }
-                }
-             
         String name = player.getName().toLowerCase();
         if (LimboCache.getInstance().hasLimboPlayer(name)) {
             LimboPlayer limbo = LimboCache.getInstance().getLimboPlayer(name);

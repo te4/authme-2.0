@@ -37,9 +37,9 @@ public class LimboCache {
         ItemStack[] inv = player.getInventory().getContents();
         ItemStack[] arm = player.getInventory().getArmorContents();
         int gameMode = player.getGameMode().getValue();
-        if(player.isDead()) {
+        /*if(player.isDead()) {
         	loc = player.getWorld().getSpawnLocation();
-        }
+        }*/
         cache.put(player.getName().toLowerCase(), new LimboPlayer(name, loc, inv, arm, gameMode));
     }
 

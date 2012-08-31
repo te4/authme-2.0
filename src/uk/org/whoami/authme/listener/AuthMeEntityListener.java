@@ -50,14 +50,7 @@ public class AuthMeEntityListener implements Listener {
         if (!(entity instanceof Player)) {
             return;
         }
-        /*
-         System.out.println("[ Entity Damage ] "+event.getEntity().toString());
-         @Future implementation till CombatTag dont release any apis
-        if(event.getEntity().toString().indexOf("PvPLogger") != -1 ) {
-            System.out.println("la stringa contiene PvPLogger 2");
-            return;
-        }
-        */
+        
         if(CitizensCommunicator.isNPC(entity)) {
             return;
         }
