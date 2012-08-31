@@ -23,21 +23,22 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import org.bukkit.plugin.java.JavaPlugin;
 import uk.org.whoami.authme.ConsoleLogger;
 import uk.org.whoami.authme.cache.auth.PlayerAuth;
 import uk.org.whoami.authme.cache.auth.PlayerCache;
 import uk.org.whoami.authme.datasource.DataSource;
 import uk.org.whoami.authme.security.PasswordSecurity;
 import uk.org.whoami.authme.settings.Messages;
-import uk.org.whoami.authme.settings.Settings;
 
 public class ChangePasswordCommand implements CommandExecutor {
 
     private Messages m = Messages.getInstance();
-    private Settings settings = Settings.getInstance();
     private DataSource database;
+    private JavaPlugin plugin;
 
-    public ChangePasswordCommand(DataSource database) {
+    public ChangePasswordCommand(JavaPlugin plugin, DataSource database) {
+        this.plugin = plugin;
         this.database = database;
     }
 
@@ -65,7 +66,7 @@ public class ChangePasswordCommand implements CommandExecutor {
         }
 
         try {
-            String hashnew = PasswordSecurity.getHash(settings.getPasswordHash(), args[1]);
+            String hashnew = PasswordSecurity.getHash(PasswordSecurity.getPasswordHash(plugin.getConfig().getString("settings.security.passwordHash")), args[1]);
 
             if (PasswordSecurity.comparePasswordWithHash(args[0], PlayerCache.getInstance().getAuth(name).getHash())) {
                 PlayerAuth auth = PlayerCache.getInstance().getAuth(name);

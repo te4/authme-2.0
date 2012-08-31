@@ -48,14 +48,12 @@ import uk.org.whoami.authme.cache.limbo.LimboCache;
 import uk.org.whoami.authme.citizens.CitizensCommunicator;
 import uk.org.whoami.authme.datasource.DataSource;
 import uk.org.whoami.authme.settings.Messages;
-import uk.org.whoami.authme.settings.Settings;
 import uk.org.whoami.authme.task.MessageTask;
 import uk.org.whoami.authme.task.TimeoutTask;
 
 
 public class AuthMePlayerListener implements Listener {
 
-    private Settings settings = Settings.getInstance();
     private Messages m = Messages.getInstance();
     private JavaPlugin plugin;
     private DataSource data;
@@ -83,7 +81,7 @@ public class AuthMePlayerListener implements Listener {
         }
 
         if (!data.isAuthAvailable(name)) {
-            if (!settings.isForcedRegistrationEnabled()) {
+            if (!plugin.getConfig().getBoolean("settings.restrictions.ForceSingleSession")) {
                 return;
             }
         }
@@ -123,10 +121,10 @@ public class AuthMePlayerListener implements Listener {
         if (data.isAuthAvailable(name)) {
             player.sendMessage(m._("login_msg"));
         } else {
-            if (!settings.isForcedRegistrationEnabled()) {
+            if (!plugin.getConfig().getBoolean("settings.restrictions.ForceSingleSession")) {
                 return;
             }
-            if (settings.isChatAllowed()) {
+            if (plugin.getConfig().getBoolean("settings.restrictions.allowChat")) {
                 return;
             }
             player.sendMessage(m._("reg_msg"));
@@ -156,20 +154,20 @@ public class AuthMePlayerListener implements Listener {
             return;
         }
 
-        if (!settings.isForcedRegistrationEnabled()) {
+        if (!plugin.getConfig().getBoolean("settings.restrictions.ForceSingleSession")) {
             return;
         }
 
-        if (!settings.isMovementAllowed()) {
+        if (!plugin.getConfig().getBoolean("settings.restrictions.allowMovement")) {
             event.setTo(event.getFrom());
             return;
         }
 
-        if (settings.getMovementRadius() == 0) {
+        if (plugin.getConfig().getInt("settings.restrictions.allowedMovementRadius") == 0) {
             return;
         }
 
-        int radius = settings.getMovementRadius();
+        int radius = plugin.getConfig().getInt("settings.restrictions.allowedMovementRadius");
         Location spawn = player.getWorld().getSpawnLocation();
         Location to = event.getTo();
 
@@ -195,9 +193,9 @@ public class AuthMePlayerListener implements Listener {
         
        
 
-        int min = settings.getMinNickLength();
-        int max = settings.getMaxNickLength();
-        String regex = settings.getNickRegex();
+        int min = plugin.getConfig().getInt("settings.restrictions.minNicknameLength");
+        int max = plugin.getConfig().getInt("settings.restrictions.maxNicknameLength");
+        String regex = plugin.getConfig().getString("settings.restrictions.maxNicknameLength");
 
         if (name.length() > max || name.length() < min) {
             event.disallow(Result.KICK_OTHER, "Your nickname has the wrong length. MaxLen: " + max + ", MinLen: " + min);
@@ -209,7 +207,7 @@ public class AuthMePlayerListener implements Listener {
         }
 
         //Check if forceSingleSession is set to true, so kick player that has joined with same nick of online player
-        if(player.isOnline() && settings.isForceSingleSessionEnabled()) {
+        if(player.isOnline() && plugin.getConfig().getBoolean("settings.restrictions.ForceSingleSession")) {
                //System.out.println("[Debug name] "+player.getName());
                player.kickPlayer(m._("same_nick"));
                event.disallow(PlayerLoginEvent.Result.KICK_OTHER, m._("same_nick"));  
@@ -225,7 +223,7 @@ public class AuthMePlayerListener implements Listener {
             }
         } */
        
-        if (settings.isKickNonRegisteredEnabled()) {
+        if (plugin.getConfig().getBoolean("settings.restrictions.kickNonRegistered")) {
             if (!data.isAuthAvailable(name)) {
                 event.disallow(Result.KICK_OTHER, m._("reg_only"));
                 return;
@@ -252,9 +250,9 @@ public class AuthMePlayerListener implements Listener {
         }
 
         if (data.isAuthAvailable(name)) {
-            if (settings.isSessionsEnabled()) {
+            if (plugin.getConfig().getBoolean("settings.sessions.enabled")) {
                 PlayerAuth auth = data.getAuth(name);
-                long timeout = settings.getSessionTimeout() * 60000;
+                long timeout = plugin.getConfig().getInt("settings.sessions.timeout") * 60000;
                 long lastLogin = auth.getLastLogin();
                 long cur = new Date().getTime();
 
@@ -265,7 +263,7 @@ public class AuthMePlayerListener implements Listener {
                 }
             }
         } else {
-            if (!settings.isForcedRegistrationEnabled()) {
+            if (!plugin.getConfig().getBoolean("settings.restrictions.ForceSingleSession")) {
                 return;
             }
         }
@@ -274,13 +272,13 @@ public class AuthMePlayerListener implements Listener {
         player.getInventory().setArmorContents(new ItemStack[0]);
         player.getInventory().setContents(new ItemStack[36]);
         player.setGameMode(GameMode.SURVIVAL);
-        if (settings.isTeleportToSpawnEnabled()) {
+        if (plugin.getConfig().getBoolean("settings.restrictions.teleportUnAuthedToSpawn")) {
             player.teleport(player.getWorld().getSpawnLocation());
         }
 
         String msg = data.isAuthAvailable(name) ? m._("login_msg") : m._("reg_msg");
-        int time = settings.getRegistrationTimeout() * 20;
-        int msgInterval = settings.getWarnMessageInterval();
+        int time = plugin.getConfig().getInt("settings.restrictions.timeout") * 20;
+        int msgInterval = plugin.getConfig().getInt("settings.registration.messageInterval");
         BukkitScheduler sched = plugin.getServer().getScheduler();
         if (time != 0) {
             int id = sched.scheduleSyncDelayedTask(plugin, new TimeoutTask(plugin, name), time);
@@ -326,7 +324,7 @@ public class AuthMePlayerListener implements Listener {
         
         // Check for Minecraft message kick request on same nickname
 	// Work only for off-line server
-		if (settings.isForcedRegistrationEnabled()) {
+		if (plugin.getConfig().getBoolean("settings.registration.force")) {
 			if (event.getReason().equals("You logged in from another location")) {
                             //System.out.println("[Debug same nick] "+event.getReason());	
                             event.setCancelled(true); }
@@ -362,7 +360,7 @@ public class AuthMePlayerListener implements Listener {
         }
 
         if (!data.isAuthAvailable(name)) {
-            if (!settings.isForcedRegistrationEnabled()) {
+            if (!plugin.getConfig().getBoolean("settings.restrictions.ForceSingleSession")) {
                 return;
             }
         }
@@ -388,7 +386,7 @@ public class AuthMePlayerListener implements Listener {
         }
 
         if (!data.isAuthAvailable(name)) {
-            if (!settings.isForcedRegistrationEnabled()) {
+            if (!plugin.getConfig().getBoolean("settings.restrictions.ForceSingleSession")) {
                 return;
             }
         }
@@ -414,7 +412,7 @@ public class AuthMePlayerListener implements Listener {
         }
 
         if (!data.isAuthAvailable(name)) {
-            if (!settings.isForcedRegistrationEnabled()) {
+            if (!plugin.getConfig().getBoolean("settings.restrictions.ForceSingleSession")) {
                 return;
             }
         }
@@ -438,7 +436,7 @@ public class AuthMePlayerListener implements Listener {
         }
 
         if (!data.isAuthAvailable(name)) {
-            if (!settings.isForcedRegistrationEnabled()) {
+            if (!plugin.getConfig().getBoolean("settings.restrictions.ForceSingleSession")) {
                 return;
             }
         }
@@ -462,7 +460,7 @@ public class AuthMePlayerListener implements Listener {
         }
 
         if (!data.isAuthAvailable(name)) {
-            if (!settings.isForcedRegistrationEnabled()) {
+            if (!plugin.getConfig().getBoolean("settings.restrictions.ForceSingleSession")) {
                 return;
             }
         }

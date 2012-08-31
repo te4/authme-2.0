@@ -32,14 +32,12 @@ import uk.org.whoami.authme.cache.limbo.LimboCache;
 import uk.org.whoami.authme.datasource.DataSource;
 import uk.org.whoami.authme.security.PasswordSecurity;
 import uk.org.whoami.authme.settings.Messages;
-import uk.org.whoami.authme.settings.Settings;
 import uk.org.whoami.authme.task.MessageTask;
 import uk.org.whoami.authme.task.TimeoutTask;
 
 public class UnregisterCommand implements CommandExecutor {
 
     private Messages m = Messages.getInstance();
-    private Settings settings = Settings.getInstance();
     private JavaPlugin plugin;
     private DataSource database;
 
@@ -82,8 +80,8 @@ public class UnregisterCommand implements CommandExecutor {
                 player.getInventory().setArmorContents(new ItemStack[0]);
                 player.getInventory().setContents(new ItemStack[36]);
 
-                int delay = settings.getRegistrationTimeout() * 20;
-                int interval = settings.getWarnMessageInterval();
+                int delay = plugin.getConfig().getInt("settings.restrictions.timeout") * 20;
+                int interval = plugin.getConfig().getInt("settings.registration.messageInterval");
                 BukkitScheduler sched = sender.getServer().getScheduler();
                 if (delay != 0) {
                     int id = sched.scheduleSyncDelayedTask(plugin, new TimeoutTask(plugin, name), delay);

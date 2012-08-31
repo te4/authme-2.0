@@ -1,0 +1,34 @@
+DataSource:
+  backend: file
+  mySQLDatabase: authme
+  mySQLUsername: authme
+  mySQLPassword: '12345'
+  mySQLHost: 127.0.0.1
+  mySQLPort: '3306'
+  mySQLTablename: authme
+  mySQLColumnName: username
+  mySQLColumnPassword: password
+  mySQLColumnIp: ip
+  mySQLColumnLastLogin: lastlogin
+  caching: true
+settings:
+  sessions:
+    enabled: false
+    timeout: 10
+  restrictions:
+    allowChat: false
+    kickNonRegistered: false
+    teleportUnAuthedToSpawn: true
+    maxNicknameLength: 20
+    allowMovement: false
+    minNicknameLength: 3
+    timeout: 30
+    allowedMovementRadius: 100
+    allowedNicknameCharacters: '[a-zA-Z0-9_?]*'
+  security:
+    passwordHash: SHA256
+    passwordMaxLength: 20
+  registration:
+    enabled: true
+    messageInterval: 5
+    force: true

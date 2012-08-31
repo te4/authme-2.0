@@ -27,7 +27,7 @@ public class Messages extends Configuration {
     private HashMap<String, String> map;
 
     private Messages() {
-        super(new File(Settings.MESSAGE_FILE));
+        super(new File("./plugins/AuthMe/messages.yml"));
         map = new HashMap<String, String>();
         loadDefaults();
         loadFile();

@@ -25,6 +25,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import org.bukkit.plugin.java.JavaPlugin;
 import uk.org.whoami.authme.ConsoleLogger;
 import uk.org.whoami.authme.cache.auth.PlayerAuth;
 import uk.org.whoami.authme.cache.auth.PlayerCache;
@@ -33,15 +34,15 @@ import uk.org.whoami.authme.cache.limbo.LimboPlayer;
 import uk.org.whoami.authme.datasource.DataSource;
 import uk.org.whoami.authme.security.PasswordSecurity;
 import uk.org.whoami.authme.settings.Messages;
-import uk.org.whoami.authme.settings.Settings;
 
 public class RegisterCommand implements CommandExecutor {
 
     private Messages m = Messages.getInstance();
-    private Settings settings = Settings.getInstance();
     private DataSource database;
+    private JavaPlugin plugin;
 
-    public RegisterCommand(DataSource database) {
+    public RegisterCommand(JavaPlugin plugin, DataSource database) {
+        this.plugin = plugin;
         this.database = database;
     }
 
@@ -65,7 +66,7 @@ public class RegisterCommand implements CommandExecutor {
             return true;
         }
 
-        if (!settings.isRegistrationEnabled()) {
+        if (!plugin.getConfig().getBoolean("settings.registration.enabled")) {
             player.sendMessage(m._("reg_disabled"));
             return true;
         }
@@ -81,7 +82,7 @@ public class RegisterCommand implements CommandExecutor {
         }
 
         try {
-            String hash = PasswordSecurity.getHash(settings.getPasswordHash(), args[0]);
+            String hash = PasswordSecurity.getHash(PasswordSecurity.getPasswordHash(plugin.getConfig().getString("settings.security.passwordHash")), args[0]);
 
             PlayerAuth auth = new PlayerAuth(name, hash, ip, new Date().getTime());
             if (!database.saveAuth(auth)) {
@@ -95,7 +96,7 @@ public class RegisterCommand implements CommandExecutor {
                 player.getInventory().setContents(limbo.getInventory());
                 player.getInventory().setArmorContents(limbo.getArmour());
                 player.setGameMode(GameMode.getByValue(limbo.getGameMode()));
-                if (settings.isTeleportToSpawnEnabled()) {
+                if (plugin.getConfig().getBoolean("settings.restrictions.teleportUnAuthedToSpawn")) {
                     player.teleport(limbo.getLoc());
                 }
 

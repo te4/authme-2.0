@@ -25,17 +25,18 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 
+import org.bukkit.plugin.java.JavaPlugin;
 import uk.org.whoami.authme.cache.auth.PlayerCache;
 import uk.org.whoami.authme.citizens.CitizensCommunicator;
 import uk.org.whoami.authme.datasource.DataSource;
-import uk.org.whoami.authme.settings.Settings;
 
 public class AuthMeEntityListener implements Listener {
 
     private DataSource data;
-    private Settings settings = Settings.getInstance();
+    private JavaPlugin plugin;
 
-    public AuthMeEntityListener(DataSource data) {
+    public AuthMeEntityListener(JavaPlugin plugin, DataSource data) {
+        this.plugin = plugin;
         this.data = data;
     }
 
@@ -69,7 +70,7 @@ public class AuthMeEntityListener implements Listener {
         }
 
         if (!data.isAuthAvailable(name)) {
-            if (!settings.isForcedRegistrationEnabled()) {
+            if (!plugin.getConfig().getBoolean("settings.restrictions.ForceSingleSession")) {
                 return;
             }
         }
@@ -96,7 +97,7 @@ public class AuthMeEntityListener implements Listener {
         }
 
         if (!data.isAuthAvailable(name)) {
-            if (!settings.isForcedRegistrationEnabled()) {
+            if (!plugin.getConfig().getBoolean("settings.restrictions.ForceSingleSession")) {
                 return;
             }
         }
@@ -123,7 +124,7 @@ public class AuthMeEntityListener implements Listener {
         }
 
         if (!data.isAuthAvailable(name)) {
-            if (!settings.isForcedRegistrationEnabled()) {
+            if (!plugin.getConfig().getBoolean("settings.restrictions.ForceSingleSession")) {
                 return;
             }
         }

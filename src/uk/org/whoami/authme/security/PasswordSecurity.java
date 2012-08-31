@@ -20,6 +20,7 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import uk.org.whoami.authme.ConsoleLogger;
 
 public class PasswordSecurity {
 
@@ -134,5 +135,14 @@ public class PasswordSecurity {
     public enum HashAlgorithm {
 
         MD5, SHA1, SHA256, WHIRLPOOL, XAUTH
+    }
+    
+    public static HashAlgorithm getPasswordHash (String name) {
+        try {
+            return HashAlgorithm.valueOf(name.toUpperCase());
+        } catch (IllegalArgumentException ex) {
+            ConsoleLogger.showError("Unknown Hash Algorithm; defaulting to SHA256");
+            return HashAlgorithm.SHA256;
+        }
     }
 }

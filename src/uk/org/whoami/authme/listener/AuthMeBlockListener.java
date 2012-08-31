@@ -23,17 +23,18 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 
+import org.bukkit.plugin.java.JavaPlugin;
 import uk.org.whoami.authme.cache.auth.PlayerCache;
 import uk.org.whoami.authme.citizens.CitizensCommunicator;
 import uk.org.whoami.authme.datasource.DataSource;
-import uk.org.whoami.authme.settings.Settings;
 
 public class AuthMeBlockListener implements Listener {
 
     private DataSource data;
-    private Settings settings = Settings.getInstance();
+    private JavaPlugin plugin;
 
-    public AuthMeBlockListener(DataSource data) {
+    public AuthMeBlockListener(JavaPlugin plugin, DataSource data) {
+        this.plugin = plugin;
         this.data = data;
     }
 
@@ -55,7 +56,7 @@ public class AuthMeBlockListener implements Listener {
         }
 
         if (!data.isAuthAvailable(name)) {
-            if (!settings.isForcedRegistrationEnabled()) {
+            if (!plugin.getConfig().getBoolean("settings.restrictions.ForceSingleSession")) {
                 return;
             }
         }
@@ -81,7 +82,7 @@ public class AuthMeBlockListener implements Listener {
         }
 
         if (!data.isAuthAvailable(name)) {
-            if (!settings.isForcedRegistrationEnabled()) {
+            if (!plugin.getConfig().getBoolean("settings.restrictions.ForceSingleSession")) {
                 return;
             }
         }

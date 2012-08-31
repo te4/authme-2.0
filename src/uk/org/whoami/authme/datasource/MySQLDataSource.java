@@ -24,10 +24,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import org.bukkit.plugin.java.JavaPlugin;
 import uk.org.whoami.authme.ConsoleLogger;
 import uk.org.whoami.authme.cache.auth.PlayerAuth;
 import uk.org.whoami.authme.datasource.MiniConnectionPoolManager.TimeoutException;
-import uk.org.whoami.authme.settings.Settings;
 
 public class MySQLDataSource implements DataSource {
 
@@ -42,20 +42,21 @@ public class MySQLDataSource implements DataSource {
     private String columnIp;
     private String columnLastLogin;
     private MiniConnectionPoolManager conPool;
+    private JavaPlugin plugin;
 
-    public MySQLDataSource() throws ClassNotFoundException, SQLException {
-        Settings s = Settings.getInstance();
-        this.host = s.getMySQLHost();
-        this.port = s.getMySQLPort();
-        this.username = s.getMySQLUsername();
-        this.password = s.getMySQLPassword();
 
-        this.database = s.getMySQLDatabase();
-        this.tableName = s.getMySQLTablename();
-        this.columnName = s.getMySQLColumnName();
-        this.columnPassword = s.getMySQLColumnPassword();
-        this.columnIp = s.getMySQLColumnIp();
-        this.columnLastLogin = s.getMySQLColumnLastLogin();
+    public MySQLDataSource(JavaPlugin plugin) throws ClassNotFoundException, SQLException {
+        this.plugin = plugin;
+        this.host = plugin.getConfig().getString("DataSource.mySQLHost");
+        this.port = plugin.getConfig().getString("DataSource.mySQLPort");
+        this.username = plugin.getConfig().getString("DataSource.mySQLUsername");
+        this.password = plugin.getConfig().getString("DataSource.mySQLPassword");
+        this.database = plugin.getConfig().getString("DataSource.mySQLDatabase");
+        this.tableName = plugin.getConfig().getString("DataSource.mySQLTablename");
+        this.columnName = plugin.getConfig().getString("DataSource.mySQLColumnName");
+        this.columnPassword = plugin.getConfig().getString("DataSource.mySQLColumnPassword");
+        this.columnIp = plugin.getConfig().getString("DataSource.mySQLColumnIp");
+        this.columnLastLogin = plugin.getConfig().getString("DataSource.mySQLColumnLastLogin");
 
         connect();
         setup();

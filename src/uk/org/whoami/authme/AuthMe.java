@@ -43,23 +43,22 @@ import uk.org.whoami.authme.listener.AuthMeBlockListener;
 import uk.org.whoami.authme.listener.AuthMeEntityListener;
 import uk.org.whoami.authme.listener.AuthMePlayerListener;
 import uk.org.whoami.authme.settings.Messages;
-import uk.org.whoami.authme.settings.Settings;
 import uk.org.whoami.authme.task.MessageTask;
 import uk.org.whoami.authme.task.TimeoutTask;
 
 public class AuthMe extends JavaPlugin {
 
     private DataSource database;
-    private Settings settings;
     private Messages m;
 
     @Override
     public void onEnable() {
-        settings = Settings.getInstance();
+        saveDefaultConfig();
+        
         m = Messages.getInstance();
+        String backendType = getConfig().getString("DataSource.backend").toLowerCase();
 
-        switch (settings.getDataSource()) {
-            case FILE:
+        if (backendType.equals("file")) {
                 try {
                     database = new FileDataSource();
                 } catch (IOException ex) {
@@ -67,10 +66,9 @@ public class AuthMe extends JavaPlugin {
                     this.getServer().getPluginManager().disablePlugin(this);
                     return;
                 }
-                break;
-            case MYSQL:
+        } else if (backendType.equals("mysql")) {
                 try {
-                    database = new MySQLDataSource();
+                    database = new MySQLDataSource(this);
                 } catch (ClassNotFoundException ex) {
                     ConsoleLogger.showError(ex.getMessage());
                     this.getServer().getPluginManager().disablePlugin(this);
@@ -84,26 +82,25 @@ public class AuthMe extends JavaPlugin {
                     this.getServer().getPluginManager().disablePlugin(this);
                     return;
                 }
-                break;
         }
 
-        if (settings.isCachingEnabled()) {
+        if (getConfig().getBoolean("DataSource.caching")) {
             database = new CacheDataSource(database);
         }
 
         AuthMePlayerListener playerListener = new AuthMePlayerListener(this, database);
-        AuthMeBlockListener blockListener = new AuthMeBlockListener(database);
-        AuthMeEntityListener entityListener = new AuthMeEntityListener(database);
+        AuthMeBlockListener blockListener = new AuthMeBlockListener(this, database);
+        AuthMeEntityListener entityListener = new AuthMeEntityListener(this, database);
 
         PluginManager pm = getServer().getPluginManager();
         pm.registerEvents(playerListener, this);
         pm.registerEvents(blockListener, this);
         pm.registerEvents(entityListener, this);
 
-        this.getCommand("authme").setExecutor(new AdminCommand(database));
-        this.getCommand("register").setExecutor(new RegisterCommand(database));
-        this.getCommand("login").setExecutor(new LoginCommand(database));
-        this.getCommand("changepassword").setExecutor(new ChangePasswordCommand(database));
+        this.getCommand("authme").setExecutor(new AdminCommand(this, database));
+        this.getCommand("register").setExecutor(new RegisterCommand(this, database));
+        this.getCommand("login").setExecutor(new LoginCommand(this, database));
+        this.getCommand("changepassword").setExecutor(new ChangePasswordCommand(this, database));
         this.getCommand("logout").setExecutor(new LogoutCommand(this,database));
         this.getCommand("unregister").setExecutor(new UnregisterCommand(this, database));
 
@@ -127,7 +124,7 @@ public class AuthMe extends JavaPlugin {
             boolean authAvail = database.isAuthAvailable(name);
 
             if (authAvail) {
-                if (settings.isSessionsEnabled()) {
+                if (getConfig().getBoolean("settings.sessions.enabled")) {
                     PlayerAuth auth = database.getAuth(name);
                     if (auth.getNickname().equals(name) && auth.getIp().equals(ip)) {
                         PlayerCache.getInstance().addPlayer(auth);
@@ -135,9 +132,9 @@ public class AuthMe extends JavaPlugin {
                         break;
                     }
                 }
-            } else if (!settings.isForcedRegistrationEnabled()) {
+            } else if (!getConfig().getBoolean("settings.registration.force")) {
                 break;
-            } else if (settings.isKickNonRegisteredEnabled()) {
+            } else if (getConfig().getBoolean("settings.restrictions.kickNonRegistered")) {
                 player.kickPlayer(m._("reg_only"));
                 break;
             }
@@ -146,13 +143,13 @@ public class AuthMe extends JavaPlugin {
             player.getInventory().setArmorContents(new ItemStack[0]);
             player.getInventory().setContents(new ItemStack[36]);
 
-            if (settings.isTeleportToSpawnEnabled()) {
+            if (getConfig().getBoolean("settings.restrictions.teleportUnAuthedToSpawn")) {
                 player.teleport(player.getWorld().getSpawnLocation());
             }
 
             String msg = authAvail ? m._("login_msg") : m._("reg_msg");
-            int time = settings.getRegistrationTimeout() * 20;
-            int msgInterval = settings.getWarnMessageInterval();
+            int time = getConfig().getInt("settings.restrictions.timeout") * 20;
+            int msgInterval = getConfig().getInt("settings.registration.messageInterval");
             BukkitScheduler sched = this.getServer().getScheduler();
             if (time != 0) {
                 int id = sched.scheduleSyncDelayedTask(this, new TimeoutTask(this, name), time);

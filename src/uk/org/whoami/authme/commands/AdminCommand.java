@@ -23,21 +23,22 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
+import org.bukkit.plugin.java.JavaPlugin;
 import uk.org.whoami.authme.ConsoleLogger;
 import uk.org.whoami.authme.cache.auth.PlayerAuth;
 import uk.org.whoami.authme.cache.auth.PlayerCache;
 import uk.org.whoami.authme.datasource.DataSource;
 import uk.org.whoami.authme.security.PasswordSecurity;
 import uk.org.whoami.authme.settings.Messages;
-import uk.org.whoami.authme.settings.Settings;
 
 public class AdminCommand implements CommandExecutor {
 
     private Messages m = Messages.getInstance();
-    private Settings settings = Settings.getInstance();
     private DataSource database;
+    private JavaPlugin plugin;
 
-    public AdminCommand(DataSource database) {
+    public AdminCommand(JavaPlugin plugin, DataSource database) {
+        this.plugin = plugin;
         this.database = database;
     }
 
@@ -71,7 +72,7 @@ public class AdminCommand implements CommandExecutor {
             }
         } else if (args[0].equalsIgnoreCase("reload")) {
             database.reload();
-            settings.reload();
+            plugin.reloadConfig();
             m.reload();
             sender.sendMessage(m._("reload"));
         } else if (args[0].equalsIgnoreCase("register")) {
@@ -82,7 +83,7 @@ public class AdminCommand implements CommandExecutor {
 
             try {
                 String name = args[1].toLowerCase();
-                String hash = PasswordSecurity.getHash(settings.getPasswordHash(), args[2]);
+                String hash = PasswordSecurity.getHash(PasswordSecurity.getPasswordHash(plugin.getConfig().getString("settings.security.passwordHash")), args[2]);
 
                 if (database.isAuthAvailable(name)) {
                     sender.sendMessage(m._("user_regged"));
@@ -108,7 +109,7 @@ public class AdminCommand implements CommandExecutor {
 
             try {
                 String name = args[1].toLowerCase();
-                String hash = PasswordSecurity.getHash(settings.getPasswordHash(), args[2]);
+                String hash = PasswordSecurity.getHash(PasswordSecurity.getPasswordHash(plugin.getConfig().getString("settings.security.passwordHash")), args[2]);
 
                 PlayerAuth auth = null;
                 if (PlayerCache.getInstance().isAuthenticated(name)) {

@@ -25,6 +25,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import org.bukkit.plugin.java.JavaPlugin;
 import uk.org.whoami.authme.ConsoleLogger;
 import uk.org.whoami.authme.cache.auth.PlayerAuth;
 import uk.org.whoami.authme.cache.auth.PlayerCache;
@@ -33,15 +34,15 @@ import uk.org.whoami.authme.cache.limbo.LimboPlayer;
 import uk.org.whoami.authme.datasource.DataSource;
 import uk.org.whoami.authme.security.PasswordSecurity;
 import uk.org.whoami.authme.settings.Messages;
-import uk.org.whoami.authme.settings.Settings;
 
 public class LoginCommand implements CommandExecutor {
 
     private Messages m = Messages.getInstance();
-    private Settings settings = Settings.getInstance();
     private DataSource database;
+    private JavaPlugin plugin;
 
-    public LoginCommand(DataSource database) {
+    public LoginCommand(JavaPlugin plugin, DataSource database) {
+        this.plugin = plugin;
         this.database = database;
     }
 
@@ -87,7 +88,7 @@ public class LoginCommand implements CommandExecutor {
                     player.getInventory().setContents(limbo.getInventory());
                     player.getInventory().setArmorContents(limbo.getArmour());
                     player.setGameMode(GameMode.getByValue(limbo.getGameMode()));
-                    if (settings.isTeleportToSpawnEnabled()) {
+                    if (plugin.getConfig().getBoolean("settings.restrictions.teleportUnAuthedToSpawn")) {
                         player.teleport(limbo.getLoc());
                     }
                     sender.getServer().getScheduler().cancelTask(limbo.getTimeoutTaskId());
@@ -97,7 +98,7 @@ public class LoginCommand implements CommandExecutor {
                 ConsoleLogger.info(player.getDisplayName() + " logged in!");
             } else {
                 ConsoleLogger.info(player.getDisplayName() + " used the wrong password");
-                if (settings.isKickOnWrongPasswordEnabled()) {
+                if (plugin.getConfig().getBoolean("settings.restrictions.kickOnWrongPassword")) {
                     player.kickPlayer(m._("wrong_pwd"));
                 } else {
                     player.sendMessage(m._("wrong_pwd"));

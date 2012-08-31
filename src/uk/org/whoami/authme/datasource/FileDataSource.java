@@ -27,7 +27,6 @@ import java.util.ArrayList;
 
 import uk.org.whoami.authme.ConsoleLogger;
 import uk.org.whoami.authme.cache.auth.PlayerAuth;
-import uk.org.whoami.authme.settings.Settings;
 
 public class FileDataSource implements DataSource {
 
@@ -43,7 +42,7 @@ public class FileDataSource implements DataSource {
     private File source;
 
     public FileDataSource() throws IOException {
-        source = new File(Settings.AUTH_FILE);
+        source = new File("./plugins/AuthMe/auths.db");
         source.createNewFile();
     }
 
