@@ -17,20 +17,23 @@
 package uk.org.whoami.authme.settings;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.HashMap;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 
-import org.bukkit.util.config.Configuration;
+//import org.bukkit.util.config.Configuration;
 
-public class Messages extends Configuration {
+public class Messages /*extends YamlConfiguration*/ {
 
     private static Messages singleton = null;
     private HashMap<String, String> map;
 
     private Messages() {
-        super(new File("./plugins/AuthMe/messages.yml"));
+        //loadConfiguration(new File("./plugins/AuthMe/messages.yml"));
         map = new HashMap<String, String>();
         loadDefaults();
-        loadFile();
+        //loadFile();
     }
 
     private void loadDefaults() {
@@ -61,7 +64,7 @@ public class Messages extends Configuration {
         map.put("unknown_user", "User is not in database");
     }
 
-    private void loadFile() {
+    /*private void loadFile() {
         this.load();
         for (String key : map.keySet()) {
             if (this.getString(key) == null) {
@@ -71,7 +74,7 @@ public class Messages extends Configuration {
             }
         }
         this.save();
-    }
+    }*/
 
     public String _(String msg) {
         String loc = map.get(msg);
@@ -81,9 +84,9 @@ public class Messages extends Configuration {
         return msg;
     }
 
-    public void reload() {
+    /*public void reload() {
         loadFile();
-    }
+    }*/
 
     public static Messages getInstance() {
         if (singleton == null) {

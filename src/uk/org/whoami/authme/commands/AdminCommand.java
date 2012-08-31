@@ -73,7 +73,7 @@ public class AdminCommand implements CommandExecutor {
         } else if (args[0].equalsIgnoreCase("reload")) {
             database.reload();
             plugin.reloadConfig();
-            m.reload();
+            //m.reload();
             sender.sendMessage(m._("reload"));
         } else if (args[0].equalsIgnoreCase("register")) {
             if (args.length != 3) {
